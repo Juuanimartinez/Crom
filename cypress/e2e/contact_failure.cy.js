@@ -11,7 +11,7 @@ describe('Pruebas de fallo en el formulario de contacto', () => {
 
     it('no permite el envío del formulario con nombre y país inválidos', () => {
         contactFormFailure.fillFormWithSpecificallyInvalidData();
-        contactFormFailure.submitForm();
-        contactFormFailure.verifyFormNotSubmitted();
+        
+        contactFormFailure.submitFormAndVerifyFailure();
     });
 });

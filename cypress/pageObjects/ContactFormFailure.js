@@ -26,10 +26,33 @@ class ContactFormFailure {
     }
 
     // Método para verificar que el formulario no se envía con datos inválidos
-    verifyFormNotSubmitted() {
-       
-        cy.url().should('eq', this.url); // Verificar que sigue en la página de contacto
+    submitFormAndVerifyFailure() {
+        // Guarda la URL actual antes de enviar el formulario
+        cy.url().then((currentUrl) => {
+            // Envía el formulario
+            this.submitForm();
+    
+            // Espera un momento para que se procese el envío y potencial redirección
+            cy.wait(1000); 
+    
+            // Verifica si la URL cambió después de intentar enviar el formulario
+            cy.url().then((newUrl) => {
+                if (newUrl !== currentUrl) {
+                    // Si la URL cambió, lanza un error para fallar la prueba
+                    throw new Error('La prueba falló porque se realizó una redirección inesperada después de enviar el formulario.');
+                } else {
+                    // Aquí incluir verificaciones adicionales para mensajes de error si no hubo redirección
+                    cy.get('body').then(($body) => {
+                        if ($body.find('p.text-red:contains("Lo siento, este campo")').length === 0) {
+                            // Si no se encuentran los mensajes de error esperados, lanza un error para fallar la prueba
+                            throw new Error('La prueba falló porque no se detectaron mensajes de error como se esperaba.');
+                        }
+                    });
+                }
+            });
+        });
     }
+    
 }
 
 export default ContactFormFailure;
